@@ -7,6 +7,7 @@ export default function Calc() {
 
   const handleClick = (e) => {
     const getSameValue = e.currentTarget.value;
+    debugger;
     switch (getSameValue) {
       // Numbers
       case "0":
@@ -23,10 +24,20 @@ export default function Calc() {
           currentValue === "0" ? getSameValue : currentValue + getSameValue
         );
         break;
+      case "x²":
+        setCurrentValue(Math.pow(parseFloat(currentValue), 2));
+        break;
+      case "x³":
+        setCurrentValue(Math.pow(parseFloat(currentValue), 3));
+        break;
+      case "√":
+        setCurrentValue(Math.sqrt(parseFloat(currentValue)));
+        break;
       case "+":
       case "-":
       case "*":
       case "%":
+      case "^":
         setPreviousValue(currentValue);
         setCurrentValue("");
         setOperator(getSameValue);
@@ -49,13 +60,14 @@ export default function Calc() {
         }
         break;
 
-      // Calculating the result
       case "=":
         const prev = parseFloat(previousValue);
         const curr = parseFloat(currentValue);
         const computation = // if operation is equal to operation, do the operation of previous value and current value
           operation === "+"
             ? prev + curr
+            : operation === "^"
+            ? Math.pow(prev, curr)
             : operation === "-"
             ? prev - curr
             : operation === "*"
@@ -77,6 +89,7 @@ export default function Calc() {
         setPreviousValue(null);
         setOperator(null);
         break;
+
       case "clearEntry":
         setCurrentValue("0");
         break;
@@ -99,10 +112,14 @@ export default function Calc() {
         {currentValue}
       </p>
       <div className="calcBtns" id="firstRow">
-        <button value="clearAll" onClick={handleClick}>
+        <button value="clearAll" className="button-bg_01" onClick={handleClick}>
           AC
         </button>
-        <button value="clearEntry" onClick={handleClick}>
+        <button
+          value="clearEntry"
+          className="button-bg_01"
+          onClick={handleClick}
+        >
           CE
         </button>
         <button value="%" onClick={handleClick}>
@@ -110,6 +127,20 @@ export default function Calc() {
         </button>
         <button value="/" onClick={handleClick}>
           ÷
+        </button>
+      </div>
+      <div className="calcBtns">
+        <button value="x²" onClick={handleClick}>
+          x²
+        </button>
+        <button value="x³" onClick={handleClick}>
+          x³
+        </button>
+        <button value="^" onClick={handleClick}>
+          ^
+        </button>
+        <button value="√" onClick={handleClick}>
+          √
         </button>
       </div>
       <div className="calcBtns">
@@ -155,7 +186,12 @@ export default function Calc() {
         </button>
       </div>
       <div className="calcBtns">
-        <button id="bigZero" value="0" onClick={handleClick}>
+        <button
+          id="bigZero"
+          className="button-bg_02"
+          value="0"
+          onClick={handleClick}
+        >
           0
         </button>
         <button value="." onClick={handleClick}>
