@@ -5,9 +5,17 @@ export default function Calc() {
   const [previousValue, setPreviousValue] = useState(null);
   const [operation, setOperator] = useState(null);
 
+  function formatValue(num) {
+    if (num >= 100000) {
+      let power = Math.floor(Math.log10(num));
+      let base = (num / Math.pow(10, power)).toFixed(2);
+      return `${base} x 10^${power}`;
+    }
+    return num.toString();
+  }
+
   const handleClick = (e) => {
     const getSameValue = e.currentTarget.value;
-    debugger;
     switch (getSameValue) {
       // Numbers
       case "0":
@@ -77,7 +85,7 @@ export default function Calc() {
             : operation === "%"
             ? (prev / 100) * curr
             : curr;
-        setCurrentValue(computation); // sets the value to the computation variable
+        setCurrentValue(formatValue(computation)); // sets the value to the computation variable
         setPreviousValue(""); // erases previous value
         setOperator(null); // erases the value of operator used
 
