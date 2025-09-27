@@ -4,15 +4,34 @@ export default function Calc() {
   const [currentValue, setCurrentValue] = useState("0");
   const [previousValue, setPreviousValue] = useState(null);
   const [operation, setOperator] = useState(null);
+  const [response, setResponse] = useState(null);
 
-  function formatValue(num) {
-    if (num >= 100000) {
-      let power = Math.floor(Math.log10(num));
-      let base = (num / Math.pow(10, power)).toFixed(2);
-      return `${base} x 10^${power}`;
-    }
-    return num.toString();
+  const API = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
+  async function calc() {
+    const r = await fetch(`${API}/calculate`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        num1: previousValue,
+        num2: currentValue,
+        operation: operation,
+      }),
+    });
+    const j = await r.json();
+    if (r.ok) {
+      setResponse(j.result);
+      setCurrentValue(null);
+      setPreviousValue(null);
+      setOperator(null);
+    } else setResponse(j.error);
   }
+
+  console.log("current value", currentValue);
+  console.log("previous value", previousValue);
+  console.log("operation", operation);
 
   const handleClick = (e) => {
     const getSameValue = e.currentTarget.value;
@@ -32,9 +51,6 @@ export default function Calc() {
           currentValue === "0" ? getSameValue : currentValue + getSameValue
         );
         break;
-      case "x²":
-        setCurrentValue(Math.pow(parseFloat(currentValue), 2));
-        break;
       case "x³":
         setCurrentValue(Math.pow(parseFloat(currentValue), 3));
         break;
@@ -51,55 +67,46 @@ export default function Calc() {
         setOperator(getSameValue);
         break;
       // error handling for not dividing by 0
-      case "/":
-        if (currentValue === "0") {
-          alert("Cannot divide by zero");
-          break;
-        }
-        setPreviousValue(currentValue);
-        setCurrentValue("");
-        setOperator(getSameValue);
-        break;
+      // case "/":
+      //   if (currentValue === "0") {
+      //     alert("Cannot divide by zero");
+      //     break;
+      //   }
+      //   setPreviousValue(currentValue);
+      //   setCurrentValue("");
+      //   setOperator(getSameValue);
+      //   break;
 
       //If there is a decimal point
-      case ".":
-        if (!currentValue.includes(".")) {
-          setCurrentValue(currentValue + ".");
-        }
-        break;
+      // case ".":
+      //   if (!currentValue.includes(".")) {
+      //     setCurrentValue(currentValue + ".");
+      //   }
+      //   break;
 
       case "=":
-        const prev = parseFloat(previousValue);
-        const curr = parseFloat(currentValue);
-        const computation = // if operation is equal to operation, do the operation of previous value and current value
-          operation === "+"
-            ? prev + curr
-            : operation === "^"
-            ? Math.pow(prev, curr)
-            : operation === "-"
-            ? prev - curr
-            : operation === "*"
-            ? prev * curr
-            : operation === "/"
-            ? prev / curr
-            : operation === "%"
-            ? (prev / 100) * curr
-            : curr;
-        setCurrentValue(formatValue(computation)); // sets the value to the computation variable
-        setPreviousValue(""); // erases previous value
-        setOperator(null); // erases the value of operator used
+        calc();
+        // setCurrentValue(formatValue(computation)); // sets the value to the computation variable
+        // setPreviousValue(""); // erases previous value
+        // setOperator(null); // erases the value of operator used
 
         break;
+      // case "x²":
+      //   setOperator(getSameValue);
+      //   calc();
+      //   break;
 
       // Clearing the results
       case "clearAll":
         setCurrentValue("0");
         setPreviousValue(null);
         setOperator(null);
+        setResponse(null);
         break;
 
       case "clearEntry":
         setCurrentValue("0");
+        setResponse(null);
         break;
       default:
         setCurrentValue(null);
@@ -118,6 +125,7 @@ export default function Calc() {
         {previousValue}
         {operation}
         {currentValue}
+        {response}
       </p>
       <div className="calcBtns" id="firstRow">
         <button value="clearAll" className="button-bg_01" onClick={handleClick}>
