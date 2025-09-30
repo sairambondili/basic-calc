@@ -6,7 +6,7 @@ export default function Calc() {
   const [operation, setOperator] = useState(null);
   const [response, setResponse] = useState(null);
 
-  const API = process.env.REACT_APP_API_URL || "http://localhost:5000";
+  const API = process.env.REACT_APP_API_URL;
 
   async function calc() {
     const r = await fetch(`${API}/calculate`, {
